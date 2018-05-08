@@ -1,0 +1,1 @@
+int SelectorVideo=0;

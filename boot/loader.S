@@ -64,13 +64,11 @@ Code32:
 	mov	es,ax
 	mov	esp,LOADER_BASE_ADDR
 	mov	esi,pro_mode_msg
-	mov	edi,80*2
 	call print
 	mov	eax,[MEM_SIZE]
 	test eax,eax
 	jnz	set_virtual_addr
 	mov	esi,r_failed_msg
-	mov	edi,80*2
 	call print
 	jmp	$
 set_virtual_addr:
@@ -101,14 +99,12 @@ set_virtual_table:
 	or	eax,0x80000000
 	mov	cr0,eax
 	mov	esi,vir_addr_msg
-	mov	edi,80*4
 	call print
 	mov	eax,KERNEL_START_SECTOR
 	mov	ebx,KERNEL_BASE_ADDR
 	mov	ecx,KERNEL_LENGTH
 	call rd_disk_m_32
 	mov	esi,kernel_in
-	mov	edi,80*6
 	call print
 	call elf_mov
 ;	lidt [IDT_PTR]
@@ -182,16 +178,52 @@ rd_disk_m_32:
 	ret
 
 print:
+	xor	eax,eax
+	mov	dx,0x3d4
+	mov	al,0xe
+	out	dx,al
+	mov	dx,0x3d5
+	in	al,dx
+	mov	ah,al
+	mov	dx,0x3d4
+	mov	al,0xf
+	out	dx,al
+	mov	dx,0x3d5
+	in	al,dx
+	mov	edi,eax
+	shl	edi,1
 	mov	ax,SelectorVideo
 	mov	gs,ax
 	mov	ah,0xc
-print_text:
+dis:
 	mov	al,[esi]
-	inc	esi
+	test al,al
+	jz	end
 	mov	[gs:edi],ax
 	add	edi,2
-	test al,al
-	jnz	print_text
+	inc	esi
+	jmp	dis
+end:
+	shr	edi,1
+	xor	edx,edx
+	mov	eax,edi
+	mov	ebx,80
+	div	ebx
+	mov	ebx,edi
+	sub	ebx,edx
+	add	ebx,80
+	mov	dx,0x3d4
+	mov	al,0xe
+	out	dx,al
+	mov	dx,0x3d5
+	mov	al,bh
+	out	dx,al
+	mov	dx,0x3d4
+	mov	al,0xf
+	out	dx,al
+	mov	dx,0x3d5
+	mov	al,bl
+	out	dx,al
 	ret
 
 ;init_8259A:

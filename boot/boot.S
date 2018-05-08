@@ -116,7 +116,7 @@ rd_disk_m_16:
 		loop .go_on_read
 		ret
 		
-	msg db "Reading loader from disk...",0
+	msg db "Reading loader from disk...",0xd,0xa,0
 	len dw $-msg-1
 	times 510-($-$$) db 0
 	db 0x55,0xaa
