@@ -43,13 +43,11 @@ SECTION MBR vstart=0x7c00
 	int 0x10						; 执行BIOS 0x10 号中断
 	
 	mov eax,LOADER_START_SECTOR	 	; 起始扇区lba地址
-	mov bx,LOADER_BASE_ADDR		 	; 写入的地址
-	mov cx,4			 			; 待读入的扇区数
-	call rd_disk_m_16		 		; 以下读取程序的起始部分（一个扇区）
-  
+	mov ebx,LOADER_BASE_ADDR	 	; 写入的地址
+	mov cx,LOADER_LENGTH 			; 待读入的扇区数
+	call rd_disk_m_16		 		; 以下读取程序的起始部分（一个扇区） 
 	jmp LOADER_BASE_ADDR
-	;jmp $
-		 
+
 ;-------------------------------------------------------------------------------
 ;功能:读取硬盘n个扇区
 rd_disk_m_16:		
@@ -113,8 +111,8 @@ rd_disk_m_16:
 		mov dx, 0x1f0
   .go_on_read:
 		in ax,dx
-		mov [bx],ax
-		add bx,2		  
+		mov [ebx],ax
+		add ebx,2		  
 		loop .go_on_read
 		ret
 		

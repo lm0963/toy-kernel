@@ -16,7 +16,7 @@ ata0-master: type=disk, path="lm0963.img", mode=flat
 boot: disk 
     
 # where do we send th log messages  
-log: bochsout.txt  
+log: .bochsout.txt  
     
 # disable the mouse  
 mouse: enabled=0  
