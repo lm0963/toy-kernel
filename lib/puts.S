@@ -1,6 +1,6 @@
 extern SelectorVideo
-global puts
-puts:
+global toy_puts
+toy_puts:
 	xor	eax,eax
 	mov	dx,0x3d4
 	mov	al,0xe
