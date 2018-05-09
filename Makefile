@@ -13,7 +13,7 @@ CC		= gcc
 LD		= ld
 ASMBFLAGS	= -I include/
 ASMKFLAGS	= -I include/ -f elf
-CFLAGS		= -I include/ -c -fno-builtin -m32
+CFLAGS		= -I include/ -c -fno-builtin -fno-stack-protector -m32
 LDFLAGS		= -s -Ttext $(ENTRYPOINT) -m elf_i386 -e main
 DASMFLAGS	= -u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
 
@@ -22,7 +22,7 @@ BOOT		= boot/boot boot/loader
 KERNEL		= kernel/kernel
 LIB			= lib/puts.o
 DASMOUTPUT	= kernel.asm
-OBJS		= kernel/kernel.o lib/puts.o lib/memcpy.o
+OBJS		= kernel/kernel.o lib/puts.o lib/memcpy.o kernel/idts.o kernel/idtc.o
 
 # All Phony Targets
 .PHONY : everything final image clean realclean disasm all buildimg
@@ -43,7 +43,7 @@ realclean :
 	rm -f $(OBJS) $(BOOT) $(LIB) $(KERNEL)
 
 disasm :
-	$(DASM) $(DASMFLAGS) > $(DASMOUTPUT)
+	$(DASM) $(DASMFLAGS) $(KERNEL) > $(DASMOUTPUT)
 
 # We assume that "a.img" exists in current folder
 buildimg :
@@ -63,7 +63,13 @@ lib/puts.o : lib/puts.S
 lib/memcpy.o : lib/memcpy.S
 	$(ASM) $(ASMKFLAGS) -o $@ $<
 
-kernel/kernel.o : kernel/kernel.c
+kernel/idts.o : kernel/idts.S 
+	$(ASM) $(ASMKFLAGS) -o $@ $<
+
+kernel/idtc.o : kernel/idtc.c include/idt.h include/global.h
+	$(CC) $(CFLAGS) -o $@ $<
+
+kernel/kernel.o : kernel/kernel.c include/global.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 kernel/kernel : $(OBJS)
