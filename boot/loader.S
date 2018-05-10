@@ -72,22 +72,24 @@ Code32:
 	call print
 	jmp	$
 set_virtual_addr:
-	mov	eax,VIRTUAL_ADDR_TABLE|ADDR_P|ADDR_RW
+	mov	eax,VIRTUAL_ADDR_TABLE|ADDR_P|ADDR_RW|ADDR_US
 	mov	[VIRTUAL_DIR_TABLE],eax
 	add	eax,0x1000
 	mov	[VIRTUAL_DIR_TABLE+4],eax
 	add	eax,0x1000
 	mov	[VIRTUAL_DIR_TABLE+8],eax
-	mov	ecx,1021
-	mov	edi,VIRTUAL_DIR_TABLE+12
+	add	eax,0x1000
+	mov	[VIRTUAL_DIR_TABLE+12],eax
+	mov	ecx,1020
+	mov	edi,VIRTUAL_DIR_TABLE+16
 loop_zero:
 	mov dword [edi],0
 	add	edi,4
 	loop loop_zero
 
-	mov	eax,0 | ADDR_P | ADDR_RW
+	mov	eax,0 | ADDR_P | ADDR_RW | ADDR_US
 	mov	edi,VIRTUAL_ADDR_TABLE
-	mov	ecx,1024*3
+	mov	ecx,1024*4
 set_virtual_table:
 	mov	[edi],eax
 	add	eax,0x1000
@@ -258,7 +260,7 @@ end:
 GDT			:Seg_Desc		0,		0,			0
 CODE_DESC	:Seg_Desc		0,		0xfffff,		DA_C+DA_32+LIMITE_32+DES_PRESENT
 DATA_DESC	:Seg_Desc		0,		0xfffff,		DA_DRW+LIMITE_32+DES_PRESENT
-VIDEO_DESC	:Seg_Desc		0xb8000,0xffff,		DA_DRW+DES_PRESENT
+VIDEO_DESC	:Seg_Desc		0xb8000,0x7fff,		DA_DRW+DES_PRESENT
 ;gdt end
 GDT_LEN		equ $-GDT
 GDT_PTR		dw	GDT_LEN-1

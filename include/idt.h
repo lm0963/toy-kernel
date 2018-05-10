@@ -28,6 +28,24 @@ typedef struct
 #define NUM_IDT_KY 33
 #define NUM_IDT_MO 44
 
+void  IDT_DE();
+void  IDT_DB();
+void  IDT_BP();
+void  IDT_OF();
+void  IDT_BR();
+void  IDT_UD();
+void  IDT_NM();
+void  IDT_DF();
+void  IDT_TS();
+void  IDT_NP();
+void  IDT_SS();
+void  IDT_GP();
+void  IDT_PF();
+void  IDT_MF();
+void  IDT_AC();
+void  IDT_MC();
+void  IDT_XF();
+
 //IDT_PTR idt_ptr;
 //GATE_DESC gate_desc[IDT_SIZE];
 

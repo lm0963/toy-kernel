@@ -20,15 +20,15 @@ DASMFLAGS	= -u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
 # This Program
 BOOT		= boot/boot boot/loader
 KERNEL		= kernel/kernel
-LIB			= lib/puts.o
+LIB			= lib/puts.o lib/memcpy.o
 DASMOUTPUT	= kernel.asm
-OBJS		= kernel/kernel.o lib/puts.o lib/memcpy.o kernel/idts.o kernel/idtc.o
+OBJS		= kernel/kernel.o lib/puts.o lib/memcpy.o kernel/idts.o kernel/idtc.o kernel/gdt.o kernel/process.o kernel/processasm.o
 
 # All Phony Targets
 .PHONY : everything final image clean realclean disasm all buildimg
 
 # Default starting position
-everything : $(BOOT) $(LIB) $(KERNEL)
+everything : $(BOOT) $(LIB) $(KERNEL) 
 
 all : realclean everything
 
@@ -66,7 +66,16 @@ lib/memcpy.o : lib/memcpy.S
 kernel/idts.o : kernel/idts.S 
 	$(ASM) $(ASMKFLAGS) -o $@ $<
 
+kernel/processasm.o : kernel/processasm.S
+	$(ASM) $(ASMKFLAGS) -o $@ $<
+
 kernel/idtc.o : kernel/idtc.c include/idt.h include/global.h
+	$(CC) $(CFLAGS) -o $@ $<
+
+kernel/gdt.o : kernel/gdt.c include/gdt.h
+	$(CC) $(CFLAGS) -o $@ $<
+
+kernel/process.o : kernel/process.c include/process.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 kernel/kernel.o : kernel/kernel.c include/global.h

@@ -1,5 +1,6 @@
-extern SelectorVideo
+extern SelectorVideo_DPL_3
 global toy_puts
+
 toy_puts:
 	xor	eax,eax
 	mov	dx,0x3d4
@@ -15,7 +16,7 @@ toy_puts:
 	in	al,dx
 	mov	edi,eax
 	shl	edi,1
-	mov	ax,[SelectorVideo]
+	mov	ax,[SelectorVideo_DPL_3]
 	mov	gs,ax
 	mov	ah,0xc
 	mov	esi,[esp+4]
@@ -23,6 +24,33 @@ dis:
 	mov	al,[esi]
 	test al,al
 	jz	end
+	cmp	edi,0xfa0
+	jb	no_roll
+	push ds
+	push es
+	push eax
+	push esi
+	push ecx
+	mov	ax,gs
+	mov	ds,ax
+	mov	es,ax
+	mov	esi,0xa0
+	mov	edi,0x00
+	mov	ecx,0x780
+	rep	movsw
+	mov	esi,0xf00
+set_0:
+	mov	dword [esi],0
+	add	esi,4
+	cmp	esi,0xfa0
+	jbe set_0
+	pop	ecx
+	pop	esi
+	pop	eax
+	pop	es
+	pop	ds
+	mov	edi,0xf00
+no_roll:
 	inc	esi
 	cmp	al,0xd
 	jz	set_line_head
