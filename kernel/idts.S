@@ -23,8 +23,10 @@ global IDT_XF
 
 extern toy_puts
 extern idt_ptr
+extern switch_process
 
 section text
+[bits 32]
 init_8259A:
 	mov	al,0x11
 	out	0x20,al
@@ -123,10 +125,15 @@ Keyboard_Handle:
 	iret
 
 Timer_Handle:
+	sub	esp,4
+	pushad
+	push ds
+	push es
+	push fs
+	push gs
+	mov	esp,0x700000
 	inc	byte [gs:0]
-	mov	al,0x20
-	out	0x20,al
-	iret
+	call switch_process
 
 section data
 

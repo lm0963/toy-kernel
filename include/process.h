@@ -59,6 +59,7 @@ typedef struct
 	int pid;
 	char name[20];
 	int used;
+	int runtime;
 }PROCESS;
 
 #define Max_Process	4

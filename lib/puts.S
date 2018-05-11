@@ -2,6 +2,7 @@ extern SelectorVideo_DPL_3
 global toy_puts
 
 toy_puts:
+	cli
 	xor	eax,eax
 	mov	dx,0x3d4
 	mov	al,0xe
@@ -84,4 +85,5 @@ end:
 	mov	dx,0x3d5
 	mov	al,bl
 	out	dx,al
+	sti
 	ret

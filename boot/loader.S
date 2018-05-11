@@ -116,7 +116,7 @@ set_virtual_table:
 ;	mov	al,0xff
 ;	out	0xa1,al
 ;	sti
-	mov	esp,KERNEL_BASE_ADDR
+	mov	esp,0x800000
 	mov	eax,[KERNEL_BASE_ADDR+24]		;elf header entry
 	jmp	eax								;jmp and nerver back
 
@@ -259,7 +259,7 @@ end:
 ;gdt						base,	limit,		attribute
 GDT			:Seg_Desc		0,		0,			0
 CODE_DESC	:Seg_Desc		0,		0xfffff,		DA_C+DA_32+LIMITE_32+DES_PRESENT
-DATA_DESC	:Seg_Desc		0,		0xfffff,		DA_DRW+LIMITE_32+DES_PRESENT
+DATA_DESC	:Seg_Desc		0,		0xfffff,		DA_DRW+LIMITE_32+DES_PRESENT+DA_32
 VIDEO_DESC	:Seg_Desc		0xb8000,0x7fff,		DA_DRW+DES_PRESENT
 ;gdt end
 GDT_LEN		equ $-GDT
