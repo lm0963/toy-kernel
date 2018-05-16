@@ -56,6 +56,7 @@ typedef struct
 	STACK regs;
 	//short SelectorLdt;
 	//Seg_Desc ldts[2];
+	void * cr3_pdir;
 	int pid;
 	char name[20];
 	int used;

@@ -21,9 +21,15 @@ global IDT_AC
 global IDT_MC
 global IDT_XF
 
+extern DPL_0_NESTED
 extern toy_puts
 extern idt_ptr
 extern switch_process
+extern Keyboard_Handler
+extern Key_Top
+extern Key_Tail
+extern Key_Buf
+extern Key_Blocked
 
 section text
 [bits 32]
@@ -117,11 +123,48 @@ idt_not_implememt:
 	iret
 
 Keyboard_Handle:
+	inc	dword [DPL_0_NESTED]
+	sub	esp,4	
+	pushad
+	push ds
+	push es
+	push fs
+	push gs
+
+	mov	eax,esp
+	mov	esp,0x800000
+	push eax
+
 	push key
 	call toy_puts
+	;call Keyboard_Handler
+	xor	edx,edx
+	mov	ebx,Key_Buf_Len
+	mov	eax,[Key_Tail]
+	;inc	eax
+	div	ebx
+	;mov	dword [Key_Blocked],1
+	cmp	edx,[Key_Top]
+	je	key_buf_full
+	inc dword [Key_Blocked]
+	mov	edi,Key_Buf
+	add	edi,edx
+	inc	edx
+	mov	[Key_Tail],edx
+	in	al,0x60
+	mov	[edi],al
+key_buf_full:
 	mov	al,0x20
 	out	0x20,al
 	add esp,4
+	pop	esp
+	pop	gs
+	pop	fs
+	pop	es
+	pop	ds
+	popad
+	add	esp,4
+	dec	dword [DPL_0_NESTED]
 	iret
 
 Timer_Handle:
@@ -131,11 +174,15 @@ Timer_Handle:
 	push es
 	push fs
 	push gs
-	mov	esp,0x700000
+	cmp	dword [DPL_0_NESTED],0
+	jnz	from_0
+	mov	esp,0x800000
 	inc	byte [gs:0]
 	call switch_process
+from_0:
+	iret
 
 section data
-
+Key_Buf_Len equ 100
 key db "keyboard hit",0xd,0xa,0
 msg db "not implememt",0xd,0

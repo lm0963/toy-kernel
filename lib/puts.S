@@ -2,6 +2,7 @@ extern SelectorVideo_DPL_3
 global toy_puts
 
 toy_puts:
+	pushf
 	cli
 	xor	eax,eax
 	mov	dx,0x3d4
@@ -20,7 +21,7 @@ toy_puts:
 	mov	ax,[SelectorVideo_DPL_3]
 	mov	gs,ax
 	mov	ah,0xc
-	mov	esi,[esp+4]
+	mov	esi,[esp+8]
 dis:
 	mov	al,[esi]
 	test al,al
@@ -66,6 +67,7 @@ set_line_head:
 	mov	ebx,0xa0
 	div	ebx
 	sub	edi,edx
+	mov	ah,0xc
 	jmp	dis
 set_next_line:
 	add	edi,0xa0
@@ -85,5 +87,5 @@ end:
 	mov	dx,0x3d5
 	mov	al,bl
 	out	dx,al
-	sti
+	popf
 	ret

@@ -72,16 +72,31 @@ Code32:
 	call print
 	jmp	$
 set_virtual_addr:
+	;mov	eax,VIRTUAL_ADDR_TABLE|ADDR_P|ADDR_RW|ADDR_US
+	;mov	[VIRTUAL_DIR_TABLE],eax
+	;add	eax,0x1000
+	;mov	[VIRTUAL_DIR_TABLE+4],eax
+	;add	eax,0x1000
+	;mov	[VIRTUAL_DIR_TABLE+8],eax
+	;add	eax,0x1000
+	;mov	[VIRTUAL_DIR_TABLE+12],eax
+	;mov	ecx,1020
+	;mov	edi,VIRTUAL_DIR_TABLE+16
+	mov	eax,[MEM_SIZE]
+	mov	ebx,0x400000
+	xor	edx,edx
+	div	ebx
+	mov	ecx,eax
+	mov	ebx,eax
 	mov	eax,VIRTUAL_ADDR_TABLE|ADDR_P|ADDR_RW|ADDR_US
-	mov	[VIRTUAL_DIR_TABLE],eax
+	mov	edi,VIRTUAL_DIR_TABLE
+set_dir:
+	mov	[edi],eax
 	add	eax,0x1000
-	mov	[VIRTUAL_DIR_TABLE+4],eax
-	add	eax,0x1000
-	mov	[VIRTUAL_DIR_TABLE+8],eax
-	add	eax,0x1000
-	mov	[VIRTUAL_DIR_TABLE+12],eax
-	mov	ecx,1020
-	mov	edi,VIRTUAL_DIR_TABLE+16
+	add	edi,4
+	loop set_dir
+	mov	ecx,1024
+	sub	ecx,ebx
 loop_zero:
 	mov dword [edi],0
 	add	edi,4
@@ -89,12 +104,16 @@ loop_zero:
 
 	mov	eax,0 | ADDR_P | ADDR_RW | ADDR_US
 	mov	edi,VIRTUAL_ADDR_TABLE
-	mov	ecx,1024*4
+set_table:
+	dec	ebx
+	mov	ecx,1024
 set_virtual_table:
 	mov	[edi],eax
 	add	eax,0x1000
 	add	edi,4
 	loop set_virtual_table
+	cmp	ebx,0
+	jnz	set_table
 	mov	eax,VIRTUAL_DIR_TABLE
 	mov	cr3,eax
 	mov	eax,cr0

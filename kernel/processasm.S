@@ -17,6 +17,8 @@ Start_Process:
 	;rep	movsd
 	;mov	eax,[esp+4]
 	;mov	esp,eax
+	mov	al,0x20
+	out	0x20,al
 	mov	esp,[esp+4]
 	pop	gs
 	pop	fs
@@ -24,8 +26,6 @@ Start_Process:
 	pop	ds
 	popad
 	add	esp,4
-	mov	al,0x20
-	out	0x20,al
 	iret
 
 pro_Asm:

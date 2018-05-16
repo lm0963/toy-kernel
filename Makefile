@@ -22,7 +22,7 @@ BOOT		= boot/boot boot/loader
 KERNEL		= kernel/kernel
 LIB			= lib/puts.o lib/memcpy.o
 DASMOUTPUT	= kernel.asm
-OBJS		= kernel/kernel.o lib/puts.o lib/memcpy.o kernel/idts.o kernel/idtc.o kernel/gdt.o kernel/process.o kernel/processasm.o
+OBJS		= kernel/kernel.o lib/puts.o lib/memcpy.o kernel/idts.o kernel/idtc.o kernel/gdt.o kernel/process.o kernel/processasm.o kernel/keyboard.o kernel/delay.o
 
 # All Phony Targets
 .PHONY : everything final image clean realclean disasm all buildimg
@@ -77,6 +77,12 @@ kernel/gdt.o : kernel/gdt.c include/gdt.h
 
 kernel/process.o : kernel/process.c include/process.h
 	$(CC) $(CFLAGS) -o $@ $<
+
+kernel/keyboard.o : kernel/keyboard.c include/global.h
+	$(CC) $(CFLAGS)	-o $@ $<
+
+kernel/delay.o : lib/delay.c include/lib.h
+	$(CC) $(CFLAGS)	-o $@ $<
 
 kernel/kernel.o : kernel/kernel.c include/global.h
 	$(CC) $(CFLAGS) -o $@ $<
