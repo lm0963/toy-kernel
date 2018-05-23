@@ -1,30 +1,53 @@
 #include "keyboard.h"
 #include "process.h"
 #include "lib.h"
+#include "keymap.h"
+
+static shift=0;
 
 void Keyboard_Process()
 {
-	int tail,top;
-	char c[2]={'\0','\0'};
+	volatile int tail,top;
+	char c[]={0,0};
 	top=(Key_Top+1)%Key_Buf_Len;
 	while(1)
 	{
 		tail=Key_Tail%Key_Buf_Len;
-		if(tail!=top)
+		while(top!=tail)
 		{
-			asm("cli");
-			Key_Buf[top]=0;
-			Key_Top=top;
-			c[0]='a'+top;
-			top=(top+1)%Key_Buf_Len;
-			asm("sti");
+			c[0]=Key_Buf[top];
 			toy_puts(c);
-			//if(Key_Blocked)
-			//	asm("int $33");
+			Key_Top=top;
+			top=(top+1)%Key_Buf_Len;
 		}
-		else
+	}
+}
+
+void Keyboard_Handler(int key)
+{
+	unsigned char c=(unsigned char)key;
+	if(Key_Tail%Key_Buf_Len==Key_Top)
+		return ;
+	if(c < 0x80)
+	{
+		if(c==shift_l || c==shift_r)
 		{
-			//toy_puts("Z");
+			shift=1;
+			return ;
 		}
+		if(c==enter)
+		{
+			Key_Buf[Key_Tail%Key_Buf_Len]='\r';
+			Key_Buf[(Key_Tail+1)%Key_Buf_Len]='\n';
+			Key_Tail=(Key_Tail+2)%Key_Buf_Len;
+			return ;
+		}
+		Key_Buf[Key_Tail%Key_Buf_Len]=keymap[c][shift];
+		Key_Tail=(Key_Tail+1)%Key_Buf_Len;
+	}
+	else
+	{
+		if(key==(shift_l | 0x80) || key==(shift_r | 0x80))
+			shift=0;
 	}
 }

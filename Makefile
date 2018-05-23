@@ -78,7 +78,7 @@ kernel/gdt.o : kernel/gdt.c include/gdt.h
 kernel/process.o : kernel/process.c include/process.h
 	$(CC) $(CFLAGS) -o $@ $<
 
-kernel/keyboard.o : kernel/keyboard.c include/global.h
+kernel/keyboard.o : kernel/keyboard.c include/global.h include/keymap.h
 	$(CC) $(CFLAGS)	-o $@ $<
 
 kernel/delay.o : lib/delay.c include/lib.h

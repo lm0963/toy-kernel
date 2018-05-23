@@ -134,26 +134,10 @@ Keyboard_Handle:
 	mov	eax,esp
 	mov	esp,0x800000
 	push eax
-
-	push key
-	call toy_puts
-	;call Keyboard_Handler
-	xor	edx,edx
-	mov	ebx,Key_Buf_Len
-	mov	eax,[Key_Tail]
-	;inc	eax
-	div	ebx
-	;mov	dword [Key_Blocked],1
-	cmp	edx,[Key_Top]
-	je	key_buf_full
-	inc dword [Key_Blocked]
-	mov	edi,Key_Buf
-	add	edi,edx
-	inc	edx
-	mov	[Key_Tail],edx
+	xor	eax,eax
 	in	al,0x60
-	mov	[edi],al
-key_buf_full:
+	push eax
+	call Keyboard_Handler
 	mov	al,0x20
 	out	0x20,al
 	add esp,4
@@ -177,7 +161,6 @@ Timer_Handle:
 	cmp	dword [DPL_0_NESTED],0
 	jnz	from_0
 	mov	esp,0x800000
-	inc	byte [gs:0]
 	call switch_process
 from_0:
 	iret

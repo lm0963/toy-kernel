@@ -47,7 +47,7 @@ int main()
 	toy_puts("this is a string from kernel\r\n");
 	//Create_Process(pro_A);
 	//Create_Process(pro_B);
-	Create_Process(pro_C);
+	//Create_Process(pro_C);
 	Create_Process(Keyboard_Process);
 	asm(
 		"movb $0xfc,%al;"

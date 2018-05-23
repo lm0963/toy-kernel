@@ -42,8 +42,8 @@ dis:
 	rep	movsw
 	mov	esi,0xf00
 set_0:
-	mov	dword [esi],0
-	add	esi,4
+	mov	word [esi],0x720
+	add	esi,2
 	cmp	esi,0xfa0
 	jbe set_0
 	pop	ecx
@@ -58,6 +58,8 @@ no_roll:
 	jz	set_line_head
 	cmp	al,0xa
 	jz	set_next_line
+	cmp	al,0x8
+	jz	delete
 	mov	[gs:edi],ax
 	add	edi,2
 	jmp	dis
@@ -71,6 +73,23 @@ set_line_head:
 	jmp	dis
 set_next_line:
 	add	edi,0xa0
+	mov	word [gs:edi],0x700
+	jmp	dis
+delete:
+	sub	edi,2
+	cmp	word [gs:edi],0x720
+	jnz	not_line
+dele:
+	cmp	word [gs:edi-2],0x720
+	jnz	del_line
+	sub	edi,2
+	jmp	dele
+del_line:
+	cmp	word [gs:edi-2],0x700
+	jnz	dis
+	sub	edi,2
+not_line:
+	mov	word[gs:edi],0x720
 	jmp	dis
 end:
 	mov	ebx,edi
